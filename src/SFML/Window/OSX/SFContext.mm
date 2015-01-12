@@ -274,6 +274,27 @@ void SFContext::createContext(SFContext* shared,
     // Free up.
     [pixFmt release];
 
+    // Perform checks to inform the user if they are getting a context they might not have expected
+
+    int version = m_settings.majorVersion * 10 + m_settings.minorVersion;
+    int requestedVersion = settings.majorVersion * 10 + settings.minorVersion;
+
+    if ((m_settings.compatibilityFlag != settings.compatibilityFlag) ||
+        (m_settings.debugFlag         != settings.debugFlag)         ||
+        (version                      <  requestedVersion))
+    {
+        err() << "Warning: The created OpenGL context does not fully meet the settings that were requested" << std::endl;
+        err() << "Requested: version = " << settings.majorVersion << "." << settings.minorVersion
+              << std::boolalpha
+              << " ; compatibility = " << settings.compatibilityFlag
+              << " ; debug = " << settings.debugFlag
+              << std::noboolalpha << std::endl;
+        err() << "Created: version = " << m_settings.majorVersion << "." << m_settings.minorVersion
+              << std::boolalpha
+              << " ; compatibility = " << m_settings.compatibilityFlag
+              << " ; debug = " << m_settings.debugFlag
+              << std::noboolalpha << std::endl;
+    }
 }
 
 } // namespace priv
