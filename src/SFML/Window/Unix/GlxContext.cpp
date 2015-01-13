@@ -185,8 +185,18 @@ void GlxContext::setVerticalSyncEnabled(bool enabled)
     // Make sure that extensions are initialized
     ensureExtensionsInit(m_display, DefaultScreen(m_display));
 
+    int result = 0;
+
+    // Prioritize the EXT variant and fall back to MESA or SGI if needed
     if (sfglx_ext_EXT_swap_control == sfglx_LOAD_SUCCEEDED)
         glXSwapIntervalEXT(m_display, glXGetCurrentDrawable(), enabled ? 1 : 0);
+    else if (sfglx_ext_MESA_swap_control == sfglx_LOAD_SUCCEEDED)
+        result = glXSwapIntervalMESA(enabled ? 1 : 0);
+    else if (sfglx_ext_SGI_swap_control == sfglx_LOAD_SUCCEEDED)
+        result = glXSwapIntervalSGI(enabled ? 1 : 0);
+
+    if (result != 0)
+        err() << "Failed to set vertical sync" << std::endl;
 }
 
 

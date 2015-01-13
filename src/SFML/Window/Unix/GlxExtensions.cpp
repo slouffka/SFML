@@ -37,6 +37,8 @@ static void* IntGetProcAddress(const char* name)
 }
 
 int sfglx_ext_EXT_swap_control = sfglx_LOAD_FAILED;
+int sfglx_ext_MESA_swap_control = sfglx_LOAD_FAILED;
+int sfglx_ext_SGI_swap_control = sfglx_LOAD_FAILED;
 int sfglx_ext_ARB_multisample = sfglx_LOAD_FAILED;
 int sfglx_ext_ARB_create_context = sfglx_LOAD_FAILED;
 int sfglx_ext_ARB_create_context_profile = sfglx_LOAD_FAILED;
@@ -48,6 +50,26 @@ static int Load_EXT_swap_control(void)
     int numFailed = 0;
     sf_ptrc_glXSwapIntervalEXT = (void (CODEGEN_FUNCPTR *)(Display *, GLXDrawable, int))IntGetProcAddress("glXSwapIntervalEXT");
     if(!sf_ptrc_glXSwapIntervalEXT) numFailed++;
+    return numFailed;
+}
+
+int (CODEGEN_FUNCPTR *sf_ptrc_glXSwapIntervalMESA)(int) = NULL;
+
+static int Load_MESA_swap_control(void)
+{
+    int numFailed = 0;
+    sf_ptrc_glXSwapIntervalMESA = (int (CODEGEN_FUNCPTR *)(int))IntGetProcAddress("glXSwapIntervalMESA");
+    if(!sf_ptrc_glXSwapIntervalMESA) numFailed++;
+    return numFailed;
+}
+
+int (CODEGEN_FUNCPTR *sf_ptrc_glXSwapIntervalSGI)(int) = NULL;
+
+static int Load_SGI_swap_control(void)
+{
+    int numFailed = 0;
+    sf_ptrc_glXSwapIntervalSGI = (int (CODEGEN_FUNCPTR *)(int))IntGetProcAddress("glXSwapIntervalSGI");
+    if(!sf_ptrc_glXSwapIntervalSGI) numFailed++;
     return numFailed;
 }
 
@@ -69,14 +91,16 @@ typedef struct sfglx_StrToExtMap_s
     PFN_LOADFUNCPOINTERS LoadExtension;
 } sfglx_StrToExtMap;
 
-static sfglx_StrToExtMap ExtensionMap[4] = {
+static sfglx_StrToExtMap ExtensionMap[6] = {
     {"GLX_EXT_swap_control", &sfglx_ext_EXT_swap_control, Load_EXT_swap_control},
+    {"GLX_MESA_swap_control", &sfglx_ext_MESA_swap_control, Load_MESA_swap_control},
+    {"GLX_SGI_swap_control", &sfglx_ext_SGI_swap_control, Load_SGI_swap_control},
     {"GLX_ARB_multisample", &sfglx_ext_ARB_multisample, NULL},
     {"GLX_ARB_create_context", &sfglx_ext_ARB_create_context, Load_ARB_create_context},
     {"GLX_ARB_create_context_profile", &sfglx_ext_ARB_create_context_profile, NULL},
 };
 
-static int g_extensionMapSize = 4;
+static int g_extensionMapSize = 6;
 
 static sfglx_StrToExtMap *FindExtEntry(const char *extensionName)
 {
@@ -94,6 +118,8 @@ static sfglx_StrToExtMap *FindExtEntry(const char *extensionName)
 static void ClearExtensionVars(void)
 {
     sfglx_ext_EXT_swap_control = sfglx_LOAD_FAILED;
+    sfglx_ext_MESA_swap_control = sfglx_LOAD_FAILED;
+    sfglx_ext_SGI_swap_control = sfglx_LOAD_FAILED;
     sfglx_ext_ARB_multisample = sfglx_LOAD_FAILED;
     sfglx_ext_ARB_create_context = sfglx_LOAD_FAILED;
     sfglx_ext_ARB_create_context_profile = sfglx_LOAD_FAILED;

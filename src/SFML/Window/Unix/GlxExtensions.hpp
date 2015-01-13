@@ -142,6 +142,8 @@ extern "C" {
 #endif /*__cplusplus*/
 
 extern int sfglx_ext_EXT_swap_control;
+extern int sfglx_ext_MESA_swap_control;
+extern int sfglx_ext_SGI_swap_control;
 extern int sfglx_ext_ARB_multisample;
 extern int sfglx_ext_ARB_create_context;
 extern int sfglx_ext_ARB_create_context_profile;
@@ -168,6 +170,17 @@ extern void (CODEGEN_FUNCPTR *sf_ptrc_glXSwapIntervalEXT)(Display *, GLXDrawable
 #define glXSwapIntervalEXT sf_ptrc_glXSwapIntervalEXT
 #endif /*GLX_EXT_swap_control*/
 
+#ifndef GLX_MESA_swap_control
+#define GLX_MESA_swap_control 1
+extern int (CODEGEN_FUNCPTR *sf_ptrc_glXSwapIntervalMESA)(int);
+#define glXSwapIntervalMESA sf_ptrc_glXSwapIntervalMESA
+#endif /*GLX_MESA_swap_control*/
+
+#ifndef GLX_SGI_swap_control
+#define GLX_SGI_swap_control 1
+extern int (CODEGEN_FUNCPTR *sf_ptrc_glXSwapIntervalSGI)(int);
+#define glXSwapIntervalSGI sf_ptrc_glXSwapIntervalSGI
+#endif /*GLX_SGI_swap_control*/
 
 #ifndef GLX_ARB_create_context
 #define GLX_ARB_create_context 1
