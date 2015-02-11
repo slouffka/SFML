@@ -12,6 +12,11 @@ endmacro()
 # this has to be done before the project() instruction!
 sfml_set_option(CMAKE_BUILD_TYPE Release STRING "Choose the type of build (Debug or Release)")
 
+# set Android specific options
+# since these influence toolchain handling, they have to be defined here
+sfml_set_option(ANDROID_STL c++_shared STRING "Choose the STL implementation to be used (has to be 'c++_shared' for now)")
+sfml_set_option(ANDROID_NATIVE_API_LEVEL 9 STRING "Choose the Android API level to be used (minimum 9)")
+
 # project name
 project(SFML)
 
@@ -69,10 +74,6 @@ if(SFML_OS_ANDROID)
         message(FATAL_ERROR "Android API level must be equal or greater than 9. Please adjust the CMake variable 'ANDROID_NATIVE_API_LEVEL'.")
     endif()
 
-    # set the STL implementation to use
-    # right now this is forced since the library is hardcoded in sfml-activity
-    set(ANDROID_STL c++_shared)
-
     # install everything in $NDK/sources/ because this path is appended by the NDK (convenient)
     set(CMAKE_INSTALL_PREFIX ${ANDROID_NDK}/sources/sfml)
 
@@ -83,6 +84,9 @@ if(SFML_OS_ANDROID)
     # we save the original compilation command line to restore it later in Macro.cmake
     set(CMAKE_CXX_CREATE_SHARED_LIBRARY_WITH_STL ${CMAKE_CXX_CREATE_SHARED_LIBRARY})
     set(CMAKE_CXX_CREATE_SHARED_LIBRARY_WITHOUT_STL "<CMAKE_CXX_COMPILER> <CMAKE_SHARED_LIBRARY_CXX_FLAGS> <LANGUAGE_COMPILE_FLAGS> <LINK_FLAGS> <CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS> <SONAME_FLAG><TARGET_SONAME> -o <TARGET> <OBJECTS> <LINK_LIBRARIES>")
+else()
+    unset(ANDROID_STL)
+    unset(ANDROID_NATIVE_API_LEVEL)
 endif()
 
 # define SFML_STATIC if the build type is not set to 'shared'
