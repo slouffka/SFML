@@ -67,7 +67,15 @@ public:
     /// \param color Number containing the RGBA components (in that order)
     ///
     ////////////////////////////////////////////////////////////
-    Color(Uint32 color);
+    explicit Color(Uint32 color);
+    
+    ////////////////////////////////////////////////////////////
+    /// \brief Retrieve the color as a 32 bit unsigned integer
+    ///
+    /// \return Color represented as a 32 bit unsigned integer
+    ///
+    ////////////////////////////////////////////////////////////
+    Uint32 toInteger();
 
     ////////////////////////////////////////////////////////////
     // Static member data
