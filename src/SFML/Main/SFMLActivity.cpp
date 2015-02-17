@@ -167,7 +167,13 @@ void ANativeActivity_onCreate(ANativeActivity* activity, void* savedState, size_
     jobject ObjectActivityInfo = lJNIEnv->CallObjectMethod(ObjectPackageManager, MethodGetActivityInfo, ObjectComponentName, GET_META_DATA);
 
     // Load our libraries in reverse order
-    loadLibrary("c++_shared", lJNIEnv, ObjectActivityInfo);
+#if defined(STL_LIBRARY)
+#define _SFML_QS(s) _SFML_S(s)
+#define _SFML_S(s) #s
+    loadLibrary(_SFML_QS(STL_LIBRARY), lJNIEnv, ObjectActivityInfo);
+#undef _SFML_S
+#undef _SFML_QS
+#endif
     loadLibrary("sndfile", lJNIEnv, ObjectActivityInfo);
     loadLibrary("openal", lJNIEnv, ObjectActivityInfo);
 

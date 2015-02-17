@@ -18,15 +18,13 @@ sfml_set_option(CMAKE_BUILD_TYPE Release STRING "Choose the type of build (Debug
 # define the minimum API level to be used
 sfml_set_option(ANDROID_NATIVE_API_LEVEL 9 STRING "Choose the Android API level to be used (minimum 9)")
 
+# define the path to the Android NDK
+sfml_set_option(ANDROID_NDK "$ENV{ANDROID_NDK}" PATH "Path to the Android NDK")
+
 # define the STL implementation to be used
-# sfml_set_option(ANDROID_STL c++_shared STRING "Choose the STL implementation to be used")
+sfml_set_option(ANDROID_STL c++_shared STRING "Choose the STL implementation to be used (experimental)")
 
-# unfortunately this has to be hardcoded to c++_shared for now
-if(NOT ANDROID_STL)
-    set(ANDROID_STL c++_shared)
-endif()
-
-# default the ABI to ARM 7a for hardware floating point
+# default the ABI to ARM v7a for hardware floating point
 if(NOT ANDROID_ABI)
     set(ANDROID_ABI armeabi-v7a)
 endif()
@@ -88,12 +86,26 @@ if(SFML_OS_ANDROID)
         message(FATAL_ERROR "Android API level must be equal or greater than 9. Please adjust the CMake variable 'ANDROID_NATIVE_API_LEVEL'.")
     endif()
 
+	if(NOT ANDROID_NDK)
+		message(FATAL_ERROR "The Android NDK couldn't be found. Please adjust the CMake variable 'ANDROID_NDK' to point to the NDK directory.")
+	endif()
+	
+	# CMake doesn't support defining the STL to be used with Nsight Tegra, so warn the user
+	if(CMAKE_VS_PLATFORM_NAME STREQUAL "Tegra-Android")
+		message(WARNING "CMake might not properly support setting the STL. Make sure to adjust all generated library projects!")
+	endif()
+	
     # install everything in $NDK/sources/ because this path is appended by the NDK (convenient)
     set(CMAKE_INSTALL_PREFIX ${ANDROID_NDK}/sources/sfml)
 
     # we install libs in a subdirectory named after the ABI (lib/mips/*.so)
     set(LIB_SUFFIX "/${ANDROID_ABI}")
 
+	# pass shared STL configuration (if any)
+	if (ANDROID_STL MATCHES "_shared")
+		add_definitions("-DSTL_LIBRARY=${ANDROID_STL}")
+	endif()
+	
     # this is a workaround to compile sfml-activity without the stl library as a dependency
     # we save the original compilation command line to restore it later in Macro.cmake
     set(CMAKE_CXX_CREATE_SHARED_LIBRARY_WITH_STL ${CMAKE_CXX_CREATE_SHARED_LIBRARY})
@@ -102,6 +114,7 @@ else()
     unset(ANDROID_ABI)
     unset(ANDROID_STL)
     unset(ANDROID_NATIVE_API_LEVEL)
+	unset(ANDROID_NDK)
 endif()
 
 # define SFML_STATIC if the build type is not set to 'shared'
