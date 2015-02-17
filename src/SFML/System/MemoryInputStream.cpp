@@ -56,7 +56,7 @@ Int64 MemoryInputStream::read(void* data, Int64 size)
         return -1;
 
     Int64 endPosition = m_offset + size;
-    Int64 count = endPosition <= m_size ? size : size - m_offset;
+    Int64 count = endPosition <= m_size ? size : m_size - m_offset;
 
     if (count > 0)
     {
